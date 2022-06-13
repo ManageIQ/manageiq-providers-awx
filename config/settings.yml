@@ -1,0 +1,28 @@
+---
+:ems:
+  :ems_awx:
+    :blacklisted_event_names: []
+    :event_handling:
+      :event_groups:
+:http_proxy:
+  :awx:
+    :host:
+    :password:
+    :port:
+    :user:
+:ems_refresh:
+  :awx_automation:
+    :allow_targeted_refresh: true
+    :inventory_collections:
+      :saver_strategy: batch
+    :refresh_interval: 15.minutes
+:log:
+  :level_awx: info
+:workers:
+  :worker_base:
+    :event_catcher:
+      :event_catcher_awx:
+        :poll: 20.seconds
+    :queue_worker_base:
+      :ems_refresh_worker:
+        :ems_refresh_worker_awx_automation: {}
