@@ -1,4 +1,4 @@
-class ManageIQ::Providers::Awx::AutomationManager::ConfigurationWorkflow < ManageIQ::Providers::ExternalAutomationManager::ConfigurationScript
+class ManageIQ::Providers::Awx::AutomationManager::ConfigurationWorkflow < ManageIQ::Providers::ExternalAutomationManager::ConfigurationWorkflow
   include ProviderObjectMixin
 
   def run_with_miq_job(options, userid = nil)
