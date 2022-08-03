@@ -1,6 +1,6 @@
 class ManageIQ::Providers::Awx::AutomationManager::EventParser
   def self.source
-    "AWX"
+    "ANSIBLETOWER"
   end
 
   def self.event_to_hash(event, ems_id)
