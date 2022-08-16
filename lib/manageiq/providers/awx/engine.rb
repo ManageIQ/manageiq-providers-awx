@@ -16,7 +16,7 @@ module ManageIQ
         end
 
         def self.plugin_name
-          _('Awx Provider')
+          _('AWX Provider')
         end
 
         def self.init_loggers
