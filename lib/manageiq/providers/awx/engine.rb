@@ -20,7 +20,7 @@ module ManageIQ
         end
 
         def self.init_loggers
-          $awx_log ||= Vmdb::Loggers.create_logger("awx.log")
+          $awx_log ||= Vmdb::Loggers.create_logger("awx.log", Vmdb::Loggers::ProviderSdkLogger)
         end
 
         def self.apply_logger_config(config)
