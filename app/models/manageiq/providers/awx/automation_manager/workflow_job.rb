@@ -1,8 +1,6 @@
 class ManageIQ::Providers::Awx::AutomationManager::WorkflowJob <
   ManageIQ::Providers::ExternalAutomationManager::OrchestrationStack
 
-  require_nested :Status
-
   belongs_to :ext_management_system, :foreign_key => :ems_id, :class_name => "ManageIQ::Providers::AutomationManager"
   belongs_to :workflow_template, :foreign_key => :orchestration_template_id, :class_name => "ManageIQ::Providers::Awx::AutomationManager::ConfigurationWorkflow"
 

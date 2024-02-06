@@ -1,7 +1,6 @@
 require 'ansible_tower_client'
 class ManageIQ::Providers::Awx::AutomationManager::Job <
   ManageIQ::Providers::ExternalAutomationManager::OrchestrationStack
-  require_nested :Status
 
   belongs_to :ext_management_system, :foreign_key => :ems_id, :class_name => "ManageIQ::Providers::AutomationManager"
   belongs_to :job_template, :foreign_key => :configuration_script_id, :class_name => "ConfigurationScript"
