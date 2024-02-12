@@ -10,6 +10,8 @@ class ManageIQ::Providers::Awx::AutomationManager::Credential < ManageIQ::Provid
   include ProviderObjectMixin
 
   supports :create
+  supports :update
+  supports :delete
 
   def self.provider_collection(manager)
     manager.with_provider_connection do |connection|
