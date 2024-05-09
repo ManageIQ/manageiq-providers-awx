@@ -1,4 +1,3 @@
-require 'ansible_tower_client'
 class ManageIQ::Providers::Awx::AutomationManager::Job <
   ManageIQ::Providers::ExternalAutomationManager::OrchestrationStack
 
@@ -72,6 +71,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
   end
 
   def refresh_ems
+    require 'ansible_tower_client'
     ext_management_system.with_provider_connection do |connection|
       update_with_provider_object(connection.api.jobs.find(ems_ref))
     end
@@ -144,6 +144,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
   private :update_plays
 
   def raw_status
+    require 'ansible_tower_client'
     ext_management_system.with_provider_connection do |connection|
       raw_job = connection.api.jobs.find(ems_ref)
       self.class.status_class.new(raw_job.status, nil)
@@ -157,6 +158,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
   end
 
   def raw_stdout(format = 'txt')
+    require 'ansible_tower_client'
     ext_management_system.with_provider_connection do |connection|
       connection.api.jobs.find(ems_ref).stdout(format)
     end
@@ -169,6 +171,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
   end
 
   def raw_artifacts
+    require 'ansible_tower_client'
     ext_management_system.with_provider_connection do |connection|
       connection.api.jobs.find(ems_ref).artifacts
     end

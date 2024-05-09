@@ -9,6 +9,7 @@ module ManageIQ::Providers::Awx::AutomationManager::TowerApi
     end
 
     def create_in_provider(manager_id, params)
+      require 'ansible_tower_client'
       manager = ExtManagementSystem.find(manager_id)
       tower_object = raw_create_in_provider(manager, params)
       refresh_in_provider_notify(manager_id, params, tower_object)
@@ -75,6 +76,7 @@ module ManageIQ::Providers::Awx::AutomationManager::TowerApi
   end
 
   def update_in_provider(params)
+    require 'ansible_tower_client'
     self.class.process_secrets(params, true) if self.class.respond_to?(:process_secrets)
     params.delete(:task_id) # in case this is being called through update_in_provider_queue which will stick in a :task_id
     params.delete(:miq_task_id) # miq_queue.activate_miq_task will stick in a :miq_task_id
@@ -104,6 +106,7 @@ module ManageIQ::Providers::Awx::AutomationManager::TowerApi
   end
 
   def delete_in_provider
+    require 'ansible_tower_client'
     raw_delete_in_provider
     self.class.send('refresh', manager)
   rescue AnsibleTowerClient::ClientError => error
