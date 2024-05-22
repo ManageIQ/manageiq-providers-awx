@@ -41,6 +41,7 @@ class ManageIQ::Providers::Awx::AutomationManager::WorkflowJob <
   end
 
   def raw_status
+    require 'ansible_tower_client'
     ext_management_system.with_provider_connection do |connection|
       raw_job = connection.api.workflow_jobs.find(ems_ref)
       self.class.status_class.new(raw_job.status, nil)
@@ -73,6 +74,7 @@ class ManageIQ::Providers::Awx::AutomationManager::WorkflowJob <
   private_class_method :reconcile_extra_vars_keys
 
   def refresh_ems
+    require 'ansible_tower_client'
     ext_management_system.with_provider_connection do |connection|
       update_with_provider_object(connection.api.workflow_jobs.find(ems_ref))
     end
