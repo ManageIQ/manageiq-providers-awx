@@ -4,7 +4,8 @@ class ManageIQ::Providers::Awx::AutomationManager::Credential < ManageIQ::Provid
   # CUD operations in the TowerApi concern
 
   alias_attribute :manager_id, :resource_id
-  alias_attribute :manager, :resource
+  alias_method :manager,  :resource
+  alias_method :manager=, :resource=
 
   include ManageIQ::Providers::Awx::AutomationManager::TowerApi
   include ProviderObjectMixin
