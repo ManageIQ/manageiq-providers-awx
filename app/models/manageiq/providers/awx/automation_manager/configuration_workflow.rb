@@ -19,7 +19,7 @@ class ManageIQ::Providers::Awx::AutomationManager::ConfigurationWorkflow < Manag
   end
 
   def self.display_name(number = 1)
-    n_('Workflow Template (AWX)', 'Workflow Templates (AWX)', number)
+    n_('Workflow Template (%{provider_description})', 'Workflow Templates (%{provider_description})', number) % {:provider_description => module_parent.description}
   end
 
   def self.provider_collection(manager)
