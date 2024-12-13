@@ -15,7 +15,7 @@ class ManageIQ::Providers::Awx::AutomationManager::ConfigurationScript <
   end
 
   def self.display_name(number = 1)
-    n_('Job Template (AWX)', 'Job Templates (AWX)', number)
+    n_('Job Template (%{provider_description})', 'Job Templates (%{provider_description})', number) % {:provider_description => module_parent.description}
   end
 
   def self.stack_type

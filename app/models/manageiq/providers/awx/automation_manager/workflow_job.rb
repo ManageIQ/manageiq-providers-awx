@@ -37,7 +37,7 @@ class ManageIQ::Providers::Awx::AutomationManager::WorkflowJob <
   alias jobs orchestration_stacks
 
   def self.display_name(number = 1)
-    n_('AWX Workflow Job', 'AWX Workflow Jobs', number)
+    n_('%{provider_description} Workflow Job', '%{provider_description} Workflow Jobs', number) % {:provider_description => module_parent.description}
   end
 
   def raw_status

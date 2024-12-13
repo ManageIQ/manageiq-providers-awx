@@ -3,7 +3,7 @@ class ManageIQ::Providers::Awx::AutomationManager::ConfiguredSystem <
   include ProviderObjectMixin
 
   def self.display_name(number = 1)
-    n_('Configured System (AWX)', 'Configured Systems (AWX)', number)
+    n_('Configured System (%{provider_description})', 'Configured Systems (%{provider_description})', number) % {:provider_description => module_parent.description}
   end
 
   def provider_object(connection = nil)

@@ -8,7 +8,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
   virtual_has_many :job_plays
 
   def self.display_name(number = 1)
-    n_('AWX Job', 'AWX Jobs', number)
+    n_('%{provider_description} Job', '%{provider_description} Jobs', number) % {:provider_description => module_parent.description}
   end
 
   class << self
