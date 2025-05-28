@@ -5,8 +5,6 @@
 [![Test Coverage](https://codeclimate.com/github/ManageIQ/manageiq-providers-awx/badges/coverage.svg)](https://codeclimate.com/github/ManageIQ/manageiq-providers-awx/coverage)
 [![Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ManageIQ/manageiq-providers-ansible_tower?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build history for master branch](https://buildstats.info/github/chart/ManageIQ/manageiq-providers-awx?branch=master&buildCount=50&includeBuildsFromPullRequest=false&showstats=false)](https://github.com/ManageIQ/manageiq-providers-awx/actions?query=branch%3Amaster)
-
 ManageIQ plugin for the AWX provider.
 
 ## Development
