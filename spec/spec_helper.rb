@@ -11,9 +11,6 @@ require "manageiq/providers/awx"
 VCR.configure do |config|
   config.ignore_hosts 'codeclimate.com' if ENV['CI']
   config.cassette_library_dir = File.join(ManageIQ::Providers::Awx::Engine.root, 'spec/vcr_cassettes')
-  Rails.application.secrets.awx.keys do |secret|
-    config.define_cassette_placeholder(Rails.application.secrets.awx_defaults[secret]) do
-      Rails.application.secrets.awx[secret]
-    end
-  end
+
+  VcrSecrets.define_all_cassette_placeholders(config, :awx)
 end

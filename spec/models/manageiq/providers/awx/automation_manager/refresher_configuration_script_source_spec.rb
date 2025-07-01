@@ -1,9 +1,9 @@
 describe ManageIQ::Providers::Awx::AutomationManager::Refresher do
   include_context "uses tower_data.yml"
 
-  let(:tower_url) { Rails.application.secrets.awx[:url] }
-  let(:auth_userid) { Rails.application.secrets.awx[:user] }
-  let(:auth_password) { Rails.application.secrets.awx[:password] }
+  let(:tower_url) { VcrSecrets.awx.url }
+  let(:auth_userid) { VcrSecrets.awx.user }
+  let(:auth_password) { VcrSecrets.awx.password }
 
   let(:auth)                    { FactoryBot.create(:authentication, :userid => auth_userid, :password => auth_password) }
   let(:automation_manager)      { provider.automation_manager }
