@@ -1,6 +1,6 @@
 # ManageIQ::Providers::Awx
 
-[![CI](https://github.com/ManageIQ/manageiq-providers-awx/actions/workflows/ci.yaml/badge.svg?branch=spassky)](https://github.com/ManageIQ/manageiq-providers-awx/actions/workflows/ci.yaml)
+[![CI](https://github.com/ManageIQ/manageiq-providers-awx/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/ManageIQ/manageiq-providers-awx/actions/workflows/ci.yaml)
 [![Code Climate](https://codeclimate.com/github/ManageIQ/manageiq-providers-awx.svg)](https://codeclimate.com/github/ManageIQ/manageiq-providers-awx)
 [![Test Coverage](https://codeclimate.com/github/ManageIQ/manageiq-providers-awx/badges/coverage.svg)](https://codeclimate.com/github/ManageIQ/manageiq-providers-awx/coverage)
 [![Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ManageIQ/manageiq-providers-ansible_tower?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
