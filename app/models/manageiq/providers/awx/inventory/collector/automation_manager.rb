@@ -4,30 +4,38 @@ class ManageIQ::Providers::Awx::Inventory::Collector::AutomationManager < Manage
   end
 
   def config
-    connection.api.config
+    config, _status_code, _headers = AwxClient::ConfigApi.new(connection).config_retrieve_with_http_info(:debug_return_type => "String")
+    JSON.parse(config)
   end
 
   def inventories
-    connection.api.inventories.all
+    # TODO paging
+    AwxClient::InventoriesApi.new(connection).inventories_list.results
   end
 
   def hosts
-    connection.api.hosts.all
+    # TODO paging
+    AwxClient::HostsApi.new(connection).hosts_list.results
   end
 
   def job_templates
-    connection.api.job_templates.all
+    AwxClient::JobTemplatesApi.new(connection).job_templates_list.results
   end
 
   def configuration_workflows
-    connection.api.workflow_job_templates.all
+    AwxClient::WorkflowJobTemplatesApi.new(connection).workflow_job_templates_list.results
   end
 
   def projects
-    connection.api.projects.all
+    AwxClient::ProjectsApi.new(connection).projects_list.results
+  end
+
+  def project_playbooks(project)
+    playbook_names, _status_code, _headers = AwxClient::ProjectsApi.new(connection).projects_playbooks_retrieve_with_http_info(project.id, :debug_return_type => "String")
+    JSON.parse(playbook_names)
   end
 
   def credentials
-    connection.api.credentials.all
+    AwxClient::CredentialsApi.new(connection).credentials_list.results
   end
 end

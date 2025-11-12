@@ -38,6 +38,10 @@ class ManageIQ::Providers::Awx::Inventory::Collector::TargetCollection < ManageI
     @projects = find_records(:configuration_script_sources, connection.api.projects)
   end
 
+  def project_playbooks(project)
+    # TODO
+  end
+
   def credentials
     find_records(:credentials, connection.api.credentials)
   end

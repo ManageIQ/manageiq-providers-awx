@@ -16,7 +16,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Credential < ManageIQ::Provid
 
   def self.provider_collection(manager)
     manager.with_provider_connection do |connection|
-      connection.api.credentials
+      AwxClient::CredentialsApi(connection).credentials_list
     end
   end
 

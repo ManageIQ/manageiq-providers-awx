@@ -33,7 +33,7 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
       inventory_object = persister.configured_systems.find_or_build(host.id)
       inventory_object.hostname = host.name
       inventory_object.virtual_instance_ref = host.instance_id
-      inventory_object.inventory_root_group = persister.inventory_root_groups.lazy_find(host.inventory_id.to_s)
+      inventory_object.inventory_root_group = persister.inventory_root_groups.lazy_find(host.inventory.to_s)
       inventory_object.counterpart = persister.cross_link_vms.lazy_find({:uid_ems => host.instance_id}, :ref => :by_uid_ems)
     end
   end
@@ -126,11 +126,11 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
       inventory_object.last_update_error = nil
 
       unless inventory_object.status == 'successful'
-        last_update = project.last_update
-        inventory_object.last_update_error = last_update.stdout.mb_chars.limit(ERROR_MAX_SIZE) if last_update
+        # TODO last_update = project.last_update
+        # inventory_object.last_update_error = last_update.stdout.mb_chars.limit(ERROR_MAX_SIZE) if last_update
       end
 
-      project.playbooks.each do |playbook_name|
+      collector.project_playbooks(project).each do |playbook_name|
         inventory_object_playbook = persister.configuration_script_payloads.find_or_build_by(
           :configuration_script_source => inventory_object,
           :manager_ref                 => playbook_name
@@ -167,7 +167,7 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
       inventory_object.name = credential.name
       inventory_object.userid = credential.try(:username)
       inventory_object.type = miq_credential_types[credential.kind] || "#{provider_module}::AutomationManager::Credential"
-      if credential.kind == 'ssh' && !credential.vault_password.empty?
+      if credential.kind == 'ssh' # TODO && !credential.vault_password.empty?
         inventory_object.type = "#{provider_module}::AutomationManager::VaultCredential"
       end
       inventory_object.options = inventory_object.type.constantize::EXTRA_ATTRIBUTES.keys.each_with_object({}) do |k, h|
