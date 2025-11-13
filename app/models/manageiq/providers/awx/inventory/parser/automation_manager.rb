@@ -2,12 +2,23 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
   ERROR_MAX_SIZE = 50.kilobytes
 
   def parse
+    config
     inventory_root_groups
     configured_systems
     configuration_scripts
     configuration_script_sources
     credentials
     configuration_workflows
+  end
+
+  def config
+    api_version = collector.config&.dig("version")
+    return if api_version.nil?
+
+    persister.ext_management_system.build(
+      :guid        => persister.manager.guid,
+      :api_version => api_version
+    )
   end
 
   def inventory_root_groups

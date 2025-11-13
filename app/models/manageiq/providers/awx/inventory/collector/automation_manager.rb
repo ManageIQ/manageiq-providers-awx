@@ -3,6 +3,10 @@ class ManageIQ::Providers::Awx::Inventory::Collector::AutomationManager < Manage
     @connection ||= manager.connect
   end
 
+  def config
+    connection.api.config
+  end
+
   def inventories
     connection.api.inventories.all
   end
