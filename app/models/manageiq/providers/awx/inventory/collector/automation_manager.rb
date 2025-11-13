@@ -23,9 +23,21 @@ class ManageIQ::Providers::Awx::Inventory::Collector::AutomationManager < Manage
     paginated_get { |page| job_templates_api.job_templates_list(:page => page) }
   end
 
+  def job_template_survey_spec(job_template)
+    job_templates_api = AwxClient::JobTemplatesApi.new(connection)
+    data, _, _ = job_templates_api.job_templates_survey_spec_retrieve_with_http_info(job_template.id, :debug_return_type => "String")
+    YAML.load(data)
+  end
+
   def configuration_workflows
     workflow_job_templates_api = AwxClient::WorkflowJobTemplatesApi.new(connection)
     paginated_get { |page| workflow_job_templates_api.workflow_job_templates_list(:page => page) }
+  end
+
+  def workflow_job_template_survey_spec(workflow_job_template)
+    workflow_job_templates_api = AwxClient::WorkflowJobTemplatesApi.new(connection)
+    data, _, _ = workflow_job_templates_api.workflow_job_templates_survey_spec_retrieve_with_http_info(workflow_job_template.id, :debug_return_type => "String")
+    YAML.load(data)
   end
 
   def projects
