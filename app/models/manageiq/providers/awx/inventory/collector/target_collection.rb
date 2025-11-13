@@ -11,6 +11,10 @@ class ManageIQ::Providers::Awx::Inventory::Collector::TargetCollection < ManageI
     infer_related_manager_refs!
   end
 
+  def config
+    connection.api.config
+  end
+
   def inventories
     find_records(:inventory_root_groups, connection.api.inventories)
   end

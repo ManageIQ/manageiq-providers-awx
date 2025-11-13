@@ -3,6 +3,7 @@ module ManageIQ::Providers::Awx::Inventory::Persister::Definitions::AutomationCo
 
   def initialize_automation_inventory_collections
     %i[
+      ext_management_system
       authentication_configuration_script_bases
       credentials
       configuration_scripts
