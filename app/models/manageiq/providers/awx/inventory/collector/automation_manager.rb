@@ -1,4 +1,4 @@
-class ManageIQ::Providers::Awx::Inventory::Collector::AutomationManager < ManageIQ::Providers::Inventory::Collector
+class ManageIQ::Providers::Awx::Inventory::Collector::AutomationManager < ManageIQ::Providers::Awx::Inventory::Collector
   def connection
     @connection ||= manager.connect
   end
@@ -9,33 +9,38 @@ class ManageIQ::Providers::Awx::Inventory::Collector::AutomationManager < Manage
   end
 
   def inventories
-    # TODO paging
-    AwxClient::InventoriesApi.new(connection).inventories_list.results
+    inventories_api = AwxClient::InventoriesApi.new(connection)
+    paginated_get { |page| inventories_api.inventories_list(:page => page) }
   end
 
   def hosts
-    # TODO paging
-    AwxClient::HostsApi.new(connection).hosts_list.results
+    hosts_api = AwxClient::HostsApi.new(connection)
+    paginated_get { |page| hosts_api.hosts_list(:page => page) }
   end
 
   def job_templates
-    AwxClient::JobTemplatesApi.new(connection).job_templates_list.results
+    job_templates_api = AwxClient::JobTemplatesApi.new(connection)
+    paginated_get { |page| job_templates_api.job_templates_list(:page => page) }
   end
 
   def configuration_workflows
-    AwxClient::WorkflowJobTemplatesApi.new(connection).workflow_job_templates_list.results
+    workflow_job_templates_api = AwxClient::WorkflowJobTemplatesApi.new(connection)
+    paginated_get { |page| workflow_job_templates_api.workflow_job_templates_list(:page => page) }
   end
 
   def projects
-    AwxClient::ProjectsApi.new(connection).projects_list.results
+    projects_api = AwxClient::ProjectsApi.new(connection)
+    paginated_get { |page| projects_api.projects_list(:page => page) }
   end
 
   def project_playbooks(project)
+    projects_api = AwxClient::ProjectsApi.new(connection)
     playbook_names, _status_code, _headers = AwxClient::ProjectsApi.new(connection).projects_playbooks_retrieve_with_http_info(project.id, :debug_return_type => "String")
     JSON.parse(playbook_names)
   end
 
   def credentials
-    AwxClient::CredentialsApi.new(connection).credentials_list.results
+    credentials_api = AwxClient::CredentialsApi.new(connection)
+    paginated_get { |page| credentials_api.credentials_list(:page => page) }
   end
 end
