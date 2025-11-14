@@ -5,6 +5,14 @@ class ManageIQ::Providers::Awx::AutomationManager::ConfigurationScript <
 
   supports :create
 
+  def self.manager_class
+    module_parent
+  end
+
+  def my_zone
+    manager&.my_zone
+  end
+
   def run_with_miq_job(options, userid = nil)
     options[:name] = "Job Template: #{name}"
     options[:ansible_template_id] = id
