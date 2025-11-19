@@ -1,6 +1,8 @@
 class ManageIQ::Providers::Awx::AutomationManager::Job <
   ManageIQ::Providers::ExternalAutomationManager::OrchestrationStack
 
+  include ProviderObjectMixin
+
   belongs_to :ext_management_system, :foreign_key => :ems_id, :class_name => "ManageIQ::Providers::AutomationManager"
   belongs_to :job_template, :foreign_key => :configuration_script_id, :class_name => "::ConfigurationScript"
   belongs_to :playbook, :foreign_key => :configuration_script_base_id
@@ -70,10 +72,16 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
     resources.where(:resource_category => 'job_play').order(:start_time)
   end
 
+  def provider_object(connection = nil)
+    connection ||= ext_management_system.connect
+    connection.api.jobs.find(ems_ref)
+  end
+
   def refresh_ems
     require 'ansible_tower_client'
-    ext_management_system.with_provider_connection do |connection|
-      update_with_provider_object(connection.api.jobs.find(ems_ref))
+
+    with_provider_object do |raw_job|
+      update_with_provider_object(raw_job)
     end
   rescue AnsibleTowerClient::ResourceNotFoundError
     msg = "Awx Job #{name} with id(#{id}) does not exist on #{ext_management_system.name}"
@@ -145,8 +153,7 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
 
   def raw_status
     require 'ansible_tower_client'
-    ext_management_system.with_provider_connection do |connection|
-      raw_job = connection.api.jobs.find(ems_ref)
+    with_provider_object do |raw_job|
       self.class.status_class.new(raw_job.status, nil)
     end
   rescue AnsibleTowerClient::ResourceNotFoundError
@@ -159,8 +166,8 @@ class ManageIQ::Providers::Awx::AutomationManager::Job <
 
   def raw_stdout(format = 'txt')
     require 'ansible_tower_client'
-    ext_management_system.with_provider_connection do |connection|
-      connection.api.jobs.find(ems_ref).stdout(format)
+    with_provider_object do |raw_job|
+      raw_job.stdout(format)
     end
   rescue AnsibleTowerClient::ResourceNotFoundError
     msg = "Awx Job #{name} with id(#{id}) or its stdout does not exist on #{ext_management_system.name}"
