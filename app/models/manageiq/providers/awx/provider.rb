@@ -106,38 +106,39 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
     verify_connection(raw_connect(url, userid, password, verify_ssl))
   end
 
-  def self.default_api_path
-    "/api/v2".freeze
-  end
-
   def self.adjust_url(url)
     url = "http://#{url}" unless url =~ %r{\Ahttps?:\/\/} # HACK: URI can't properly parse a URL with no scheme
-    URI(url).tap do |adjusted_url|
-      adjusted_url.path = default_api_path if adjusted_url.path.blank?
-    end
+    URI(url)
   end
 
   def self.verify_connection(connection)
-    require 'ansible_tower_client'
+    require 'awx_client'
     begin
-      connection.api.verify_credentials ||
-        raise(MiqException::MiqInvalidCredentialsError, _("Username or password is not valid"))
-    rescue AnsibleTowerClient::ClientError => err
-      raise MiqException::MiqCommunicationsError, err.message, err.backtrace
+      me_api  = AwxClient::MeApi.new(connection)
+      me_api.me_list&.results&.first&.username
+    rescue AwxClient::ApiError => err
+      if err.code == 401
+        raise MiqException::MiqInvalidCredentialsError, _("Username or password is not valid")
+      else
+        raise MiqException::MiqCommunicationsError, err.message, err.backtrace
+      end
     end
   end
 
   def self.raw_connect(url, username, password, verify_ssl)
-    base_url = adjust_url(url).to_s
+    base_url = adjust_url(url)
 
-    require 'ansible_tower_client'
-    AnsibleTowerClient.logger = $ansible_tower_log
-    AnsibleTowerClient::Connection.new(
-      :base_url   => base_url,
-      :username   => username,
-      :password   => password,
-      :verify_ssl => verify_ssl
-    )
+    require 'awx_client'
+    config = AwxClient::Configuration.new
+    config.logger     = $ansible_tower_log
+    config.scheme     = base_url.scheme
+    config.host       = "#{base_url.host}:#{base_url.port}"
+    config.verify_ssl = verify_ssl
+    config.username   = username
+    config.password   = password
+    config.client_side_validation = false # TOOO project id client validation fails
+
+    AwxClient::ApiClient.new(config).tap { |api| api.default_headers["Authorization"] ||= config.basic_auth_token}
   end
 
   def self.refresh_ems(provider_ids)
