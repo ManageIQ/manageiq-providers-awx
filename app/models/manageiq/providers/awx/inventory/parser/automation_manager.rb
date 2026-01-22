@@ -33,7 +33,7 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
       inventory_object = persister.configured_systems.find_or_build(host.id)
       inventory_object.hostname = host.name
       inventory_object.virtual_instance_ref = host.instance_id
-      inventory_object.inventory_root_group = persister.inventory_root_groups.lazy_find(host.inventory_id.to_s)
+      inventory_object.inventory_root_group = persister.inventory_root_groups.lazy_find(host.inventory.to_s)
       inventory_object.counterpart = persister.cross_link_vms.lazy_find({:uid_ems => host.instance_id}, :ref => :by_uid_ems)
     end
   end
@@ -42,10 +42,10 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
     provider_module = ManageIQ::Providers::Inflector.provider_module(collector.manager.class).name
     collector.job_templates.each do |job_template|
       begin
-        survey_spec = job_template.survey_spec_hash
-        variables   = job_template.extra_vars_hash
+        survey_spec = collector.job_template_survey_spec(job_template)
+        variables   = YAML.load(job_template.extra_vars)
 
-        inventory_root_group = persister.inventory_root_groups.lazy_find(job_template.inventory_id.to_s)
+        inventory_root_group = persister.inventory_root_groups.lazy_find(job_template.inventory.to_s)
         parent               = persister.configuration_script_payloads.lazy_find(
           # checking job_template.project_id due to https://github.com/ansible/ansible_tower_client_ruby/issues/68
           # if we hit a job_template which has no related project and thus .project_id is not defined
@@ -90,8 +90,8 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
     provider_module = ManageIQ::Providers::Inflector.provider_module(collector.manager.class).name
     collector.configuration_workflows.each do |job_template|
       begin
-        survey_spec = job_template.survey_spec_hash
-        variables   = job_template.extra_vars_hash
+        survey_spec = collector.workflow_job_template_survey_spec(job_template)
+        variables   = YAML.load(job_template.extra_vars)
 
         persister.configuration_scripts.build(
           :manager_ref => job_template.id.to_s,
@@ -122,15 +122,17 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
       inventory_object.scm_delete_on_update = project.scm_delete_on_update
       inventory_object.scm_update_on_launch = project.scm_update_on_launch
       inventory_object.status = project.status
+      byebug if project.last_updated.nil?
       inventory_object.last_updated_on = project.last_updated
       inventory_object.last_update_error = nil
 
       unless inventory_object.status == 'successful'
+        # TODO
         last_update = project.last_update
         inventory_object.last_update_error = last_update.stdout.mb_chars.limit(ERROR_MAX_SIZE) if last_update
       end
 
-      project.playbooks.each do |playbook_name|
+      collector.project_playbooks(project).each do |playbook_name|
         inventory_object_playbook = persister.configuration_script_payloads.find_or_build_by(
           :configuration_script_source => inventory_object,
           :manager_ref                 => playbook_name
@@ -167,7 +169,7 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
       inventory_object.name = credential.name
       inventory_object.userid = credential.try(:username)
       inventory_object.type = miq_credential_types[credential.kind] || "#{provider_module}::AutomationManager::Credential"
-      if credential.kind == 'ssh' && !credential.vault_password.empty?
+      if credential.kind == 'ssh' # TODO && !credential.vault_password.empty?
         inventory_object.type = "#{provider_module}::AutomationManager::VaultCredential"
       end
       inventory_object.options = inventory_object.type.constantize::EXTRA_ATTRIBUTES.keys.each_with_object({}) do |k, h|
