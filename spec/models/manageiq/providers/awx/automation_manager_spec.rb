@@ -5,7 +5,7 @@ describe ManageIQ::Providers::Awx::AutomationManager do
     let(:ems) { FactoryBot.create(:automation_manager_awx) }
 
     it "#catalog_types" do
-      expect(ems.catalog_types).to include("generic_awx")
+      expect(ems.catalog_types).to eq({"awx" => "AWX", "generic_awx" => "AWX (deprecated)"})
     end
   end
 

@@ -56,7 +56,7 @@ class ManageIQ::Providers::Awx::AutomationManager < ManageIQ::Providers::Externa
   end
 
   def self.catalog_types
-    {"generic_awx" => N_("AWX")}
+    {"generic_awx" => N_("AWX (deprecated)"), "awx" => N_("AWX")}
   end
 
   def self.display_name(number = 1)
