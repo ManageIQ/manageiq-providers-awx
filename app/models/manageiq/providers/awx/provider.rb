@@ -8,6 +8,7 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
   before_validation :ensure_managers
   validates :name, :presence => true, :uniqueness => true
   validates :url,  :presence => true
+  validate :url_format_valid?
 
   def self.params_for_create
     @params_for_create ||= {
@@ -32,7 +33,7 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
                   :name       => "endpoints.default.url",
                   :label      => _("URL"),
                   :isRequired => true,
-                  :validate   => [{:type => "required"}]
+                  :validate   => [{:type => "required"}, {:type => "url"}]
                 },
                 {
                   :component    => "select",
@@ -79,6 +80,16 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
     }.freeze
   end
 
+  def self.url_format_valid?(url)
+    URI::DEFAULT_PARSER.make_regexp(%w[http https]).match?(url)
+  end
+
+  def url_format_valid?
+    return false if url.blank? # Presence is checked elsewhere
+
+    errors.add(:url, N_("has to be a valid URL")) unless self.class.url_format_valid?(url)
+  end
+
   # Verify Credentials
   # args: {
   #  "endpoints" => {
@@ -111,7 +122,6 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
   end
 
   def self.adjust_url(url)
-    url = "http://#{url}" unless url =~ %r{\Ahttps?:\/\/} # HACK: URI can't properly parse a URL with no scheme
     URI(url).tap do |adjusted_url|
       adjusted_url.path = default_api_path if adjusted_url.path.blank?
     end
@@ -128,6 +138,8 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
   end
 
   def self.raw_connect(url, username, password, verify_ssl)
+    raise ArgumentError, "Invalid URL" unless url_format_valid?(url)
+
     base_url = adjust_url(url).to_s
 
     require 'ansible_tower_client'
