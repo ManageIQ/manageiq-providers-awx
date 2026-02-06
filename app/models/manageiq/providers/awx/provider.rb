@@ -107,31 +107,33 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
   # }
   def self.verify_credentials(args)
     default_authentication = args.dig("authentications", "default")
-    url = args.dig("endpoints", "default", "url")
-    verify_ssl = args.dig("endpoints", "default", "verify_ssl")
+    default_endpoint       = args.dig("endpoints", "default")
 
-    userid   = default_authentication["userid"]
-    password = ManageIQ::Password.try_decrypt(default_authentication["password"])
+    url, verify_ssl = default_endpoint.values_at("url", "verify_ssl")
+    url = URI(url)
+
+    userid, password = default_authentication.values_at("userid", "password")
+    password   = ManageIQ::Password.try_decrypt(password) if password
     password ||= find(args["id"]).authentication_password
 
-    verify_connection(raw_connect(url, userid, password, verify_ssl))
-  end
-
-  def self.default_api_path
-    "/api/v2".freeze
-  end
-
-  def self.adjust_url(url)
-    URI(url).tap do |adjusted_url|
-      adjusted_url.path = default_api_path if adjusted_url.path.blank?
+    connection_rescue_block do
+      url.path = "/api/controller/v2" if url.path.blank?
+      verify_connection(raw_connect(url, userid, password, verify_ssl))
+    rescue AnsibleTowerClient::ResourceNotFoundError
+      url.path = "/api/v2"
+      verify_connection(raw_connect(url, userid, password, verify_ssl))
     end
   end
 
   def self.verify_connection(connection)
+    connection.api.verify_credentials ||
+      raise(MiqException::MiqInvalidCredentialsError, _("Username or password is not valid"))
+  end
+
+  def self.connection_rescue_block
     require 'ansible_tower_client'
     begin
-      connection.api.verify_credentials ||
-        raise(MiqException::MiqInvalidCredentialsError, _("Username or password is not valid"))
+      yield
     rescue AnsibleTowerClient::ClientError => err
       raise MiqException::MiqCommunicationsError, err.message, err.backtrace
     end
@@ -140,12 +142,10 @@ class ManageIQ::Providers::Awx::Provider < ::Provider
   def self.raw_connect(url, username, password, verify_ssl)
     raise ArgumentError, "Invalid URL" unless url_format_valid?(url)
 
-    base_url = adjust_url(url).to_s
-
     require 'ansible_tower_client'
     AnsibleTowerClient.logger = $ansible_tower_log
     AnsibleTowerClient::Connection.new(
-      :base_url   => base_url,
+      :base_url   => url,
       :username   => username,
       :password   => password,
       :verify_ssl => verify_ssl
