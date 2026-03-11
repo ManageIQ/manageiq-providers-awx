@@ -58,6 +58,17 @@ describe ManageIQ::Providers::Awx::AutomationManager::Provision do
       expect(subject.reload.phase).to eq("check_provisioned")
     end
 
+    context "with a service_guid" do
+      let(:service) { FactoryBot.create(:service) }
+      let(:options)      { {:source => [job_template.id, job_template.name], :service_guid => service.guid} }
+
+      it "adds the stack to the service" do
+        subject.run_provision
+
+        expect(service.reload.service_resources.find_by(:resource_type => "OrchestrationStack").resource).to eq(new_stack)
+      end
+    end
+
     context "when create_stack fails" do
       before do
         expect(described_class.module_parent::Job).to receive(:create_stack).and_raise

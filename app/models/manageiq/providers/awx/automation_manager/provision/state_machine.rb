@@ -8,6 +8,8 @@ module ManageIQ::Providers::Awx::AutomationManager::Provision::StateMachine
     stack       = stack_class.create_stack(source)
 
     phase_context[:stack_id] = stack.id
+    connect_to_service!(stack)
+
     save!
 
     signal :check_provisioned
@@ -46,11 +48,19 @@ module ManageIQ::Providers::Awx::AutomationManager::Provision::StateMachine
     mark_execution_servers
   end
 
+  def connect_to_service!(stack)
+    service&.add_resource!(stack)
+  end
+
   def stack_klass
     @stack_klass ||= "#{source.class.module_parent}::#{source.class.stack_type}".constantize
   end
 
   def stack
     @stack ||= stack_klass.find(phase_context[:stack_id])
+  end
+
+  def service
+    @service ||= Service.find_by(:guid => options[:service_guid])
   end
 end
