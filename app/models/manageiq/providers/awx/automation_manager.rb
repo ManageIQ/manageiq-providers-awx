@@ -60,7 +60,7 @@ class ManageIQ::Providers::Awx::AutomationManager < ManageIQ::Providers::Externa
   end
 
   def self.display_name(number = 1)
-    n_('Automation Manager (AWX)', 'Automation Managers (AWX)', number)
+    n_('Automation Provider (AWX)', 'Automation Providers (AWX)', number)
   end
 
   def name
