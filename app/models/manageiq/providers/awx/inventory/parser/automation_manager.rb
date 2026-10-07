@@ -127,7 +127,7 @@ class ManageIQ::Providers::Awx::Inventory::Parser::AutomationManager < ManageIQ:
 
       unless inventory_object.status == 'successful'
         last_update = project.last_update
-        inventory_object.last_update_error = last_update.stdout.mb_chars.limit(ERROR_MAX_SIZE) if last_update
+        inventory_object.last_update_error = last_update.stdout.truncate_bytes(ERROR_MAX_SIZE, :omission => nil) if last_update
       end
 
       project.playbooks.each do |playbook_name|
